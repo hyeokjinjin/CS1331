@@ -1,16 +1,28 @@
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-// TODO JAVADOC
+/**
+ * Generic class that represents a LinkedList.
+ * @author Hyeokjin Jin
+ * @version HW08 CS1331
+ * @param <T> The type of elements that the LinkedList will hold.
+ */
 public class LinkedList<T> implements List<T> {
     private Node<T> head;
     private int size;
 
+    /**
+     * No argument constructor that sets the head Node to null and size to be zero.
+     */
     public LinkedList() {
         head = null;
         size = 0;
     }
 
+    /**
+     * Constructor that takes in an Array containing type T and each element to the end of the LinkedList.
+     * @param data Array containing elements of type T that will be added to LinkedList.
+     */
     public LinkedList(T[] data) {
         if (data == null) {
             throw new IllegalArgumentException("Input array cannot be null");
@@ -19,24 +31,32 @@ public class LinkedList<T> implements List<T> {
             if (datum == null) {
                 throw new IllegalArgumentException("Input array cannot contain any null elements.");
             }
-            add(datum); // keep adding to end
+            add(datum);
         }
     }
 
+    /**
+     * Getter method for head Node.
+     * @return head Node of the LinkedList.
+     */
     public Node<T> getHead() {
         return head;
     }
 
+    /**
+     * Method that takes the LinkedList and returns an array consisting of the elements found in the LinkedList.
+     * @return Array containing all elements from the LinkedList.
+     */
     public T[] toArray() {
-        T[] arr = (T[]) new Object[size];
+        T[] returnArray = (T[]) new Object[size];
         Node<T> currentNode = head;
         int index = 0;
 
         while (currentNode != null) {
-            arr[index++] = currentNode.getData();
+            returnArray[index++] = currentNode.getData();
             currentNode = currentNode.getNext();
         }
-        return arr;
+        return returnArray;
     }
 
     @Override
@@ -69,40 +89,45 @@ public class LinkedList<T> implements List<T> {
             throw new IllegalArgumentException("Element cannot be null.");
         }
 
-        Node<T> newNode = new Node<>(element);
+        Node<T> addedNode = new Node<>(element);
 
         if (head == null) {
-            head = newNode;
+            head = addedNode;
         } else {
             Node<T> currentNode = head;
             while (currentNode.getNext() != null) {
                 currentNode = currentNode.getNext();
             }
-            currentNode.setNext(newNode);
+            currentNode.setNext(addedNode);
         }
         size++;
     }
 
     @Override
     public void add(int index, T element) throws IndexOutOfBoundsException, IllegalArgumentException {
-        if (index > size && element == null) {
+        if (element == null && (index > size() || index < 0)) {
             throw new IndexOutOfBoundsException("Invalid index and element cannot be null.");
-        } else if (index > size) {
+        } else if (index > size() || index < 0) {
             throw new IndexOutOfBoundsException("Invalid index.");
         } else if (element == null) {
             throw new IllegalArgumentException("Element cannot be null.");
         }
 
-        int currentIndex = 0;
-        Node<T> currentNode = head;
-        while (currentIndex < index) {
-            currentNode = currentNode.getNext();
-            currentIndex++;
-        }
-
         Node<T> newNode = new Node<>(element);
-        newNode.setNext(currentNode.getNext());
-        currentNode.setNext(newNode);
+        if (index == 0) {
+            newNode.setNext(head);
+            head = newNode;
+        } else {
+            int currentIndex = 0;
+            Node<T> previousNode = head;
+            while (currentIndex < (index - 1)) {
+                previousNode = previousNode.getNext();
+                currentIndex++;
+            }
+
+            newNode.setNext(previousNode.getNext());
+            previousNode.setNext(newNode);
+        }
         size++;
     }
 
@@ -120,51 +145,65 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public T remove(int index) throws NoSuchElementException, IndexOutOfBoundsException {
-        if (isEmpty() && index >= size) {
+        if (isEmpty() && (index >= size || index < 0)) {
             throw new NoSuchElementException("Index is invalid and list is empty.");
         } else if (isEmpty()) {
             throw new NoSuchElementException("LinkedList is empty.");
-        } else if (index >= size) {
+        } else if (index >= size || index < 0) {
             throw new IndexOutOfBoundsException("Invalid Index.");
         }
 
-        int currentIndex = 0;
-        Node<T> previousNode = head;
-        while (currentIndex < (index - 1)) {
-            previousNode = previousNode.getNext();
-            currentIndex++;
-        }
+        T removedElement;
+        if (index == 0) {
+            removedElement = head.getData();
+            head = head.getNext();
+        } else {
+            Node<T> previousNode = head;
+            int currentIndex = 0;
+            while (currentIndex < (index - 1)) {
+                previousNode = previousNode.getNext();
+                currentIndex++;
+            }
 
-        Node<T> removedNode = previousNode.getNext();
-        previousNode.setNext(removedNode.getNext());
+            Node<T> removedNode = previousNode.getNext();
+            previousNode.setNext(removedNode.getNext());
+            removedElement = removedNode.getData();
+        }
         size--;
-        return removedNode.getData();
+        return removedElement;
     }
 
     @Override
     public T remove(T element) throws IllegalArgumentException, NoSuchElementException {
         if (element == null) {
-            throw new IllegalArgumentException("Argument element cannot be null.");
+            throw new IllegalArgumentException("Element cannot be null.");
         }
 
         Node<T> currentNode = head;
-
+        int nodeIndex = 0;
         while (currentNode.getNext() != null) {
-            if (currentNode.getData() == element) {
+            if (currentNode.getData().equals(element)) {
+                remove(nodeIndex);
                 return currentNode.getData();
             }
+            nodeIndex++;
             currentNode = currentNode.getNext();
         }
-        throw new NoSuchElementException("Argument element not found in the list.");
+        if (currentNode.getNext() == null && currentNode.getData().equals(element)) {
+            remove(nodeIndex);
+            return currentNode.getData();
+        } else {
+            throw new NoSuchElementException("Argument element not found in the list.");
+        }
     }
 
     @Override
     public T set(int index, T element) throws IndexOutOfBoundsException, IllegalArgumentException {
-        if (element == null && index >= size) {
+        if (element == null && (index >= size || index < 0)) {
             throw new IndexOutOfBoundsException("Element cannot be null and index is invalid");
         } else if (element == null) {
             throw new IllegalArgumentException("Element cannot be null.");
-        } else if (index >= size) {
+        } else if (index >= size || index < 0) {
             throw new IndexOutOfBoundsException("Index is invalid");
         }
 
@@ -184,12 +223,39 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public T get(int index) throws IndexOutOfBoundsException {
-        return null; // FIXME
+        if (index >= size || index < 0) {
+            throw new IndexOutOfBoundsException("Invalid index.");
+        }
+
+        int currentIndex = 0;
+        Iterator<T> iterator = iterator();
+
+        while (iterator.hasNext()) {
+            if (currentIndex == index) {
+                return iterator.next();
+            }
+            iterator.next();
+            currentIndex++;
+        }
+        return null;
     }
 
     @Override
     public boolean contains(T element) throws IllegalArgumentException {
-        return false; // FIXME
+        if (element == null) {
+            throw new IllegalArgumentException("Element cannot be null");
+        }
+
+        Iterator<T> iterator = iterator();
+
+        while (iterator.hasNext()) {
+            if (iterator.next().equals(element)) {
+                return true;
+            }
+            iterator().next();
+        }
+
+        return false;
     }
 
     @Override
@@ -210,6 +276,6 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public Iterator<T> iterator() {
-        return null; // FIXME
+        return new LinkedListIterator<>(this);
     }
 }
