@@ -16,7 +16,7 @@ public class Node<T> {
      */
     public Node(T data, Node<T> next) {
         if (data == null) {
-            throw new IllegalArgumentException("Argument data cannot be null.");
+            throw new IllegalArgumentException("Data cannot be null.");
         }
         this.data = data;
         this.next = next;

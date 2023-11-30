@@ -105,12 +105,14 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public void add(int index, T element) throws IndexOutOfBoundsException, IllegalArgumentException {
-        if (element == null && (index > size() || index < 0)) {
-            throw new IndexOutOfBoundsException("Invalid index and element cannot be null.");
+        if (element == null) {
+            if (index > size() || index < 0) {
+                throw new IndexOutOfBoundsException("Element cannot be null and have an invalid index.");
+            } else {
+                throw new IllegalArgumentException("Element cannot be null");
+            }
         } else if (index > size() || index < 0) {
             throw new IndexOutOfBoundsException("Invalid index.");
-        } else if (element == null) {
-            throw new IllegalArgumentException("Element cannot be null.");
         }
 
         Node<T> newNode = new Node<>(element);
@@ -145,12 +147,14 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public T remove(int index) throws NoSuchElementException, IndexOutOfBoundsException {
-        if (isEmpty() && (index >= size || index < 0)) {
-            throw new NoSuchElementException("Index is invalid and list is empty.");
-        } else if (isEmpty()) {
-            throw new NoSuchElementException("LinkedList is empty.");
-        } else if (index >= size || index < 0) {
-            throw new IndexOutOfBoundsException("Invalid Index.");
+        if (isEmpty()) {
+            if (index >= size() || index < 0) {
+                throw new NoSuchElementException("List is empty and index is invalid.");
+            } else {
+                throw new NoSuchElementException("List is empty.");
+            }
+        } else if (index >= size() || index < 0) {
+            throw new IndexOutOfBoundsException("Index is invalid.");
         }
 
         T removedElement;
@@ -164,7 +168,6 @@ public class LinkedList<T> implements List<T> {
                 previousNode = previousNode.getNext();
                 currentIndex++;
             }
-
             Node<T> removedNode = previousNode.getNext();
             previousNode.setNext(removedNode.getNext());
             removedElement = removedNode.getData();
@@ -178,7 +181,6 @@ public class LinkedList<T> implements List<T> {
         if (element == null) {
             throw new IllegalArgumentException("Element cannot be null.");
         }
-
         Node<T> currentNode = head;
         int nodeIndex = 0;
         while (currentNode.getNext() != null) {
@@ -193,18 +195,20 @@ public class LinkedList<T> implements List<T> {
             remove(nodeIndex);
             return currentNode.getData();
         } else {
-            throw new NoSuchElementException("Argument element not found in the list.");
+            throw new NoSuchElementException("Element not found in the list.");
         }
     }
 
     @Override
     public T set(int index, T element) throws IndexOutOfBoundsException, IllegalArgumentException {
-        if (element == null && (index >= size || index < 0)) {
-            throw new IndexOutOfBoundsException("Element cannot be null and index is invalid");
-        } else if (element == null) {
-            throw new IllegalArgumentException("Element cannot be null.");
-        } else if (index >= size || index < 0) {
-            throw new IndexOutOfBoundsException("Index is invalid");
+        if (element == null) {
+            if (index >= size() || index < 0) {
+                throw new IndexOutOfBoundsException("Element cannot be null and index is invalid.");
+            } else {
+                throw new IllegalArgumentException("Element cannot be null.");
+            }
+        } else if (index >= size() || index < 0) {
+            throw new IndexOutOfBoundsException("Index is invalid.");
         }
 
         int currentIndex = 0;
@@ -223,7 +227,7 @@ public class LinkedList<T> implements List<T> {
 
     @Override
     public T get(int index) throws IndexOutOfBoundsException {
-        if (index >= size || index < 0) {
+        if (index >= size() || index < 0) {
             throw new IndexOutOfBoundsException("Invalid index.");
         }
 
@@ -254,7 +258,6 @@ public class LinkedList<T> implements List<T> {
             }
             iterator().next();
         }
-
         return false;
     }
 
